@@ -20,4 +20,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 })
 
+app.post('/cake', (req, res) => {
+  res.status(201).json({
+    message: 'Item created',
+    service: 'Habit Cake Service',
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+  })
+});
+
 export default app;
