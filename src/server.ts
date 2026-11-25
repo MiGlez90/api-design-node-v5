@@ -1,11 +1,17 @@
 import express from 'express';
 import path from 'path';
+import authRoutes from './routes/authRoutes.ts';
+import habitRoutes from './routes/habitRoutes.ts';
+import userRoutes from './routes/userRoutes.ts';
 
-const __dirname = import.meta.dirname;
-const __filename = import.meta.filename; // Si también necesitas el archivo
+export const __dirname = import.meta.dirname;
+export const __filename = import.meta.filename;
 
 
 export const app = express();
+
+app.use(express.json()); // Parses incoming JSON payloads
+app.use(express.urlencoded({ extended: true })); // Parses HTML form submissions
 
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -28,5 +34,10 @@ app.post('/cake', (req, res) => {
     timestamp: new Date().toISOString(),
   })
 });
+
+// Strategy 1 for routing: based on resources
+app.use('/api/auth', authRoutes);
+app.use('/api/habits', habitRoutes);
+app.use('/api/users', userRoutes);
 
 export default app;
