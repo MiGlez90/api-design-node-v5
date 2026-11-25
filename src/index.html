@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Becoming a Full Stack Developer</title>
+  <style>
+    :root {
+      --turq-50: #e0f7f6;
+      --turq-100: #b2ebe7;
+      --turq-200: #80ded8;
+      --turq-300: #4dd0c8;
+      --turq-400: #26c6bc;
+      --turq-500: #00bcb0;
+      --turq-600: #00a99d;
+      --turq-700: #009185;
+      --turq-800: #00796e;
+      --turq-900: #004d45;
+      --accent: #ffcf5c;
+      --white: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(160deg, var(--turq-900), var(--turq-700) 50%, var(--turq-400));
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Burbujas flotantes de fondo */
+    .bubbles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bubbles span {
+      position: absolute;
+      bottom: -120px;
+      border-radius: 50%;
+      background: rgba(178, 235, 231, 0.15);
+      animation: rise linear infinite;
+    }
+
+    .bubbles span:nth-child(1) { left: 10%; width: 60px; height: 60px; animation-duration: 14s; }
+    .bubbles span:nth-child(2) { left: 25%; width: 30px; height: 30px; animation-duration: 10s; animation-delay: 2s; }
+    .bubbles span:nth-child(3) { left: 45%; width: 90px; height: 90px; animation-duration: 18s; animation-delay: 4s; }
+    .bubbles span:nth-child(4) { left: 65%; width: 40px; height: 40px; animation-duration: 12s; animation-delay: 1s; }
+    .bubbles span:nth-child(5) { left: 80%; width: 70px; height: 70px; animation-duration: 16s; animation-delay: 3s; }
+    .bubbles span:nth-child(6) { left: 92%; width: 25px; height: 25px; animation-duration: 9s;  animation-delay: 5s; }
+
+    @keyframes rise {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* Navegación */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: var(--turq-50);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 5rem 0 3rem;
+    }
+
+    .emoji {
+      font-size: 4rem;
+      display: inline-block;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-15px); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      margin: 1rem 0;
+      line-height: 1.1;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(90deg, var(--accent), var(--turq-100));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--turq-50);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .typing {
+      font-family: "Courier New", monospace;
+      background: rgba(0, 77, 69, 0.6);
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      color: var(--turq-100);
+    }
+
+    .typing::after {
+      content: "▋";
+      animation: blink 1s step-end infinite;
+      color: var(--accent);
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-weight: 700;
+      text-decoration: none;
+      margin: 0.4rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--turq-900);
+      box-shadow: 0 6px 0 #d9a93a;
+    }
+
+    .btn-secondary {
+      border: 2px solid var(--turq-100);
+      color: var(--turq-50);
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    /* Tarjetas */
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      margin: 3rem 0 2rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: rgba(224, 247, 246, 0.12);
+      border: 1px solid rgba(178, 235, 231, 0.3);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .card:hover {
+      transform: rotate(-2deg) translateY(-8px);
+      background: rgba(224, 247, 246, 0.22);
+    }
+
+    .card .icon {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .card p {
+      color: var(--turq-50);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Roadmap */
+    .roadmap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .step {
+      background: var(--turq-50);
+      color: var(--turq-900);
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      font-weight: 700;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .step:nth-child(odd) {
+      background: var(--turq-200);
+    }
+
+    .step:hover {
+      background: var(--accent);
+      color: var(--turq-900);
+      cursor: default;
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      color: var(--turq-100);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bubbles">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <main>
+    <nav>
+      <div class="logo">&lt;FullStack<span>/&gt;</span></div>
+      <ul>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#start">Empezar</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero">
+      <div class="emoji">🚀</div>
+      <h1>Becoming a <span class="highlight">Full Stack Developer</span></h1>
+      <p>Del frontend al backend, de la idea al deploy. ¡Bienvenido a tu aventura para dominar todo el stack!</p>
+      <div class="typing">$ npm run become-awesome</div>
+      <div>
+        <a href="#roadmap" class="btn btn-primary">Comenzar el viaje</a>
+        <a href="#skills" class="btn btn-secondary">Ver skills</a>
+      </div>
+    </section>
+
+    <h2 class="section-title" id="skills">🧰 Tu caja de herramientas</h2>
+    <section class="cards">
+      <article class="card">
+        <div class="icon">🎨</div>
+        <h3>Frontend</h3>
+        <p>HTML, CSS y JavaScript para crear interfaces bonitas, accesibles e interactivas.</p>
+      </article>
+      <article class="card">
+        <div class="icon">⚙️</div>
+        <h3>Backend</h3>
+        <p>Node.js, Express y APIs REST para dar vida a la lógica de tus aplicaciones.</p>
+      </article>
+      <article class="card">
+        <div class="icon">🗄️</div>
+        <h3>Bases de datos</h3>
+        <p>SQL y NoSQL para guardar, consultar y proteger los datos de tus usuarios.</p>
+      </article>
+      <article class="card">
+        <div class="icon">☁️</div>
+        <h3>DevOps</h3>
+        <p>Git, Docker, CI/CD y la nube para llevar tu código a producción.</p>
+      </article>
+    </section>
+
+    <h2 class="section-title" id="roadmap">🗺️ Roadmap</h2>
+    <section class="roadmap">
+      <div class="step">1. HTML & CSS</div>
+      <div class="step">2. JavaScript</div>
+      <div class="step">3. Git</div>
+      <div class="step">4. Node.js</div>
+      <div class="step">5. APIs REST</div>
+      <div class="step">6. Bases de datos</div>
+      <div class="step">7. Autenticación</div>
+      <div class="step">8. Testing</div>
+      <div class="step">9. Deploy 🎉</div>
+    </section>
+
+    <section class="hero" id="start">
+      <h2 class="section-title">¿Listo para escribir tu primer <code>console.log</code>?</h2>
+      <a href="#" class="btn btn-primary">¡Vamos! 💻</a>
+    </section>
+  </main>
+
+  <footer>
+    Hecho con 💙 y mucho café ☕ · Becoming a Full Stack Developer
+  </footer>
+</body>
+</html>

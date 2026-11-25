@@ -1,56 +1,76 @@
 import { env as loadEnv } from 'custom-env'
 import { z } from 'zod'
+import {
+  BCRYPT_ROUNDS,
+  DB_PREFIX,
+  DEFAULT_PORT,
+  ENVS,
+  JWT_CHARS_WARNING,
+  JWT_EXPIRATION,
+  NODE_ENVS,
+  NUMBER_OF_JWT_CHARS,
+} from './constants.ts'
 
-process.env.APP_STAGE = process.env.APP_STAGE || 'dev'
-
-const isProduction = process.env.APP_STAGE === 'production'
-const isDevelopment = process.env.APP_STAGE === 'dev'
-const isTesting = process.env.APP_STAGE === 'test'
-
-if (isDevelopment) {
-  loadEnv()
-} else if (isTesting) {
-  loadEnv('test')
-}
+// Define environment
+process.env.APP_STAGE = process.env.APP_STAGE || ENVS.DEV
 
 const envSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
-
-  APP_STAGE: z.enum(['dev', 'test', 'production']).default('dev'),
-
-  PORT: z.coerce.number().positive().default(3000),
-  DATABASE_URL: z.string().startsWith('postgresql://'),
-  JWT_SECRET: z.string().min(32, 'Must be 32 chars long'),
-  JWT_EXPIRES_IN: z.string().default('7d'),
-  BCRYPT_ROUNDS: z.coerce.number().min(10).max(20).default(12),
+  APP_STAGE: z.enum(Object.values(ENVS)).default(ENVS.DEV),
+  BCRYPT_ROUNDS: z.coerce
+    .number()
+    .min(BCRYPT_ROUNDS.MIN)
+    .max(BCRYPT_ROUNDS.MAX)
+    .default(BCRYPT_ROUNDS.DEFAULT),
+  DATABASE_URL: z.string().startsWith(DB_PREFIX),
+  JWT_EXPIRES_IN: z.string().default(JWT_EXPIRATION),
+  JWT_SECRET: z.string().min(NUMBER_OF_JWT_CHARS, JWT_CHARS_WARNING),
+  NODE_ENV: z.enum(Object.values(NODE_ENVS)).default(NODE_ENVS.DEV),
+  PORT: z.coerce.number().positive().default(DEFAULT_PORT),
 })
 
 export type Env = z.infer<typeof envSchema>
 let env: Env
 
-try {
-  env = envSchema.parse(process.env)
-} catch (e) {
-  if (e instanceof z.ZodError) {
-    console.log('Invalid env var')
-    console.error(JSON.stringify(e.flatten().fieldErrors, null, 2))
+const processEnv = env || process.env;
 
-    e.issues.forEach((err) => {
-      const path = err.path.join('.')
-      console.log(`${path}: ${err.message}`)
-    })
+export const isProd = processEnv.APP_STAGE === ENVS.PROD
+export const isDev = processEnv.APP_STAGE === ENVS.DEV
+export const isTest = processEnv.APP_STAGE === ENVS.TEST
 
-    process.exit(1)
-  }
-
-  throw e
+if (isDev && !env) {
+  loadEnv()
+} else if (isTest && !env) {
+  loadEnv(ENVS.TEST)
 }
 
-export const isProd = () => env.APP_STAGE === 'production'
-export const isDev = () => env.APP_STAGE === 'dev'
-export const isTest = () => env.APP_STAGE === 'test'
+function getSafeEnv() {
+  if (env) return env;
 
-export { env }
+  try {
+    env = envSchema.parse(process.env)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error('Invalid env var')
+      console.error(z.treeifyError(error))
+
+      error.issues.forEach((issue) => {
+        const path = issue.path.join('.')
+        console.error(`${path}: ${issue.message}`)
+      })
+
+      process.exit(1)
+    }
+  }
+
+  return env
+}
+
+getSafeEnv()
+
+export const getIsDev = () => env.APP_STAGE === ENVS.DEV
+
+export const getIsProd = () => env.APP_STAGE === ENVS.PROD
+
+export const getIsTest = () => env.APP_STAGE === ENVS.TEST
+
 export default env
