@@ -26,7 +26,7 @@ export const register = async (
         lastName: users.lastName,
         username: users.username,
       })
-    const token = generateToken({
+    const token = await generateToken({
       id: user.id,
       email: user.email,
       username: user.username,
@@ -63,7 +63,7 @@ export const login = async (req: Request, res: Response) => {
       })
     }
 
-    const token = generateToken({
+    const token = await generateToken({
       id: user.id,
       email: user.email,
       username: user.username,
