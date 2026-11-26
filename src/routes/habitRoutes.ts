@@ -1,4 +1,14 @@
 import { Router } from 'express'
+import { validateBody, validateParams } from '../middlewares/validation.ts'
+import z from 'zod'
+
+const createHabitSchema = z.object({
+  name: z.string(),
+})
+
+const completeParamsSchema = z.object({
+  id: z.string(),
+})
 
 const router = Router()
 
@@ -16,7 +26,7 @@ router.get('/:id', (req, res) => {
   return res.json({ data: habit })
 })
 
-router.post('/', (req, res) => {
+router.post('/', validateBody(createHabitSchema), (req, res) => {
   const body = req.body
   const habit = { id: id++, name: body.name, status: 'todo' }
   habits.push(habit)
@@ -31,16 +41,20 @@ router.delete('/:id', (req, res) => {
   res.send({ message: 'Removed' }).status(201)
 })
 
-router.post('/:id/complete', (req, res) => {
-  const id = req.params.id
-  const habit = habits.find((habit) => habit.id == id)
-  if (!habit) return res.send({ message: 'Habit not found' }).status(404)
-  habit.status = 'done'
-  habits = habits.map((h) => {
-    if (h.id === id) return habit
-    return h
-  })
-  return res.json({ data: habit })
-})
+router.post(
+  '/:id/complete',
+  validateParams(completeParamsSchema),
+  (req, res) => {
+    const id = req.params.id
+    const habit = habits.find((habit) => habit.id == id)
+    if (!habit) return res.send({ message: 'Habit not found' }).status(404)
+    habit.status = 'done'
+    habits = habits.map((h) => {
+      if (h.id === id) return habit
+      return h
+    })
+    return res.json({ data: habit })
+  }
+)
 
 export default router
