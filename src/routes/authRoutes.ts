@@ -1,12 +1,11 @@
 import { Router } from 'express'
+import { register } from '../controllers/authController.ts'
+import { validateBody } from '../middlewares/validation.ts'
+import { insertUserSchema } from '../db/schema.ts'
 
 const router = Router()
 
-router.post('/register', (req, res) => {
-  res.status(201).json({
-    message: 'User created',
-  })
-})
+router.post('/register', validateBody(insertUserSchema), register)
 
 router.post('/login', (req, res) => {
   res.status(200).json({
