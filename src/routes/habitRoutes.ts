@@ -1,59 +1,47 @@
 import { Router } from 'express'
 import { validateBody, validateParams } from '../middlewares/validation.ts'
-import z from 'zod'
+import { z } from 'zod'
+import { authenticateToken } from '../middlewares/auth.ts'
+import {
+  createHabit,
+  getUserHabits,
+  updateHabit,
+} from '../controllers/habitsController.ts'
 
 const createHabitSchema = z.object({
   name: z.string(),
+  description: z.string().optional(),
+  frequency: z.string(),
+  targetCount: z.number(),
+  tagIds: z.array(z.string()).optional(),
 })
 
 const completeParamsSchema = z.object({
-  id: z.string(),
+  id: z.string().max(3),
 })
 
 const router = Router()
 
-let id = 1
-let habits = []
+router.use(authenticateToken)
 
-router.get('/', (req, res) => {
-  res.json({ data: habits })
-})
-
+router.get('/', getUserHabits)
+router.patch('/:id', updateHabit)
 router.get('/:id', (req, res) => {
-  const id = req.params.id
-  const habit = habits.find((habit) => habit.id == id)
-  if (!habit) return res.send({ message: 'Habit not found' }).status(404)
-  return res.json({ data: habit })
+  res.json({ message: 'got one habbit' })
 })
 
-router.post('/', validateBody(createHabitSchema), (req, res) => {
-  const body = req.body
-  const habit = { id: id++, name: body.name, status: 'todo' }
-  habits.push(habit)
-  return res.send({ message: 'Created' }).status(201)
-})
+router.post('/', validateBody(createHabitSchema), createHabit)
 
 router.delete('/:id', (req, res) => {
-  const id = req.params.id
-  const habit = habits.find((habit) => habit.id == id)
-  if (!habit) return res.send({ message: 'Habit not found' }).status(404)
-  habits = habits.filter((habit) => habit.id !== id)
-  res.send({ message: 'Removed' }).status(201)
+  res.json({ message: 'deleted habit' })
 })
 
 router.post(
   '/:id/complete',
   validateParams(completeParamsSchema),
+  validateBody(createHabitSchema),
   (req, res) => {
-    const id = req.params.id
-    const habit = habits.find((habit) => habit.id == id)
-    if (!habit) return res.send({ message: 'Habit not found' }).status(404)
-    habit.status = 'done'
-    habits = habits.map((h) => {
-      if (h.id === id) return habit
-      return h
-    })
-    return res.json({ data: habit })
+    res.json({ message: 'completed habit' }).status(201)
   }
 )
 
