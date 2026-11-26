@@ -9,6 +9,7 @@ import {
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import z from 'zod'
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -118,6 +119,10 @@ export type HabitTag = typeof habitTags.$inferSelect
 
 export const insertUserSchema = createInsertSchema(users)
 export const selectUserSchema = createSelectSchema(users)
+export const loginUserSchema = z.object({
+  password: z.string().min(6, 'Password must be 6 char at least'),
+  email: z.email('Invalid email'),
+})
 export const insertHabitsSchema = createInsertSchema(habits)
 export const selectHabitsSchema = createSelectSchema(habits)
 export const insertEntriesSchema = createInsertSchema(entries)
