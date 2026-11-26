@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import { ENVS } from '../constants.ts';
 import { getIsTest } from '../env.ts';
+import { authenticateToken } from './middlewares/auth.ts';
 
 export const __dirname = import.meta.dirname;
 export const __filename = import.meta.filename;
@@ -51,7 +52,7 @@ app.post('/cake', (req, res) => {
 
 // Strategy 1 for routing: based on resources
 app.use('/api/auth', authRoutes);
-app.use('/api/habits', habitRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/habits', authenticateToken, habitRoutes);
+app.use('/api/users', authenticateToken, userRoutes);
 
 export default app;
