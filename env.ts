@@ -38,9 +38,11 @@ export const isDev = processEnv.APP_STAGE === ENVS.DEV
 export const isTest = processEnv.APP_STAGE === ENVS.TEST
 
 if (isDev && !env) {
-  loadEnv()
+  loadEnv(ENVS.DEV)
 } else if (isTest && !env) {
   loadEnv(ENVS.TEST)
+} else if (isProd && !env) {
+  loadEnv(ENVS.PROD)
 }
 
 function getSafeEnv() {
